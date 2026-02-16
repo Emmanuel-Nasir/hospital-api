@@ -122,6 +122,8 @@ router.post("/", async (req, res) => {
       lastName,
       age,
       phone,
+      doctorId: null, // Initially no doctor assigned
+      ailment, // Initially no ailment specified
       address: address || ""
     };
 
