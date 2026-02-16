@@ -24,6 +24,10 @@ const router = express.Router();
  *           type: integer
  *         phone:
  *           type: string
+ *         doctorId:
+ *           type: string
+ *         ailment:
+ *           type: string
  *         address:
  *           type: string
  */
@@ -78,7 +82,9 @@ router.get("/:id", async (req, res) => {
       return res.status(400).json({ error: "Invalid patient ID format" });
     }
 
-    const patient = await db.collection("patients").findOne({ _id: new ObjectId(id) });
+    const patient = await db
+      .collection("patients")
+      .findOne({ _id: new ObjectId(id) });
 
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" });
@@ -111,10 +117,20 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const db = getDB();
-    const { firstName, lastName, age, phone, address } = req.body;
 
+    const { firstName, lastName, age, phone, doctorId, ailment, address } =
+      req.body;
+
+    // Required validation
     if (!firstName || !lastName || !age || !phone) {
-      return res.status(400).json({ error: "firstName, lastName, age, phone are required" });
+      return res.status(400).json({
+        error: "firstName, lastName, age, phone are required",
+      });
+    }
+
+    // doctorId validation (optional but if provided must be valid)
+    if (doctorId && !ObjectId.isValid(doctorId)) {
+      return res.status(400).json({ error: "Invalid doctorId format" });
     }
 
     const newPatient = {
@@ -122,13 +138,17 @@ router.post("/", async (req, res) => {
       lastName,
       age,
       phone,
-      doctorId: null, // Initially no doctor assigned
-      ailment, // Initially no ailment specified
-      address: address || ""
+      doctorId: doctorId ? new ObjectId(doctorId) : null,
+      ailment: ailment || "",
+      address: address || "",
     };
 
     const result = await db.collection("patients").insertOne(newPatient);
-    res.status(201).json({ message: "Patient created", id: result.insertedId });
+
+    res.status(201).json({
+      message: "Patient created successfully",
+      id: result.insertedId,
+    });
   } catch (error) {
     res.status(500).json({ error: "Failed to create patient" });
   }
@@ -147,6 +167,12 @@ router.post("/", async (req, res) => {
  *         description: Patient ID
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Patient'
  *     responses:
  *       200:
  *         description: Patient updated
@@ -164,11 +190,27 @@ router.put("/:id", async (req, res) => {
       return res.status(400).json({ error: "Invalid patient ID format" });
     }
 
-    const updatedData = req.body;
+    const { firstName, lastName, age, phone, doctorId, ailment, address } =
+      req.body;
+
+    // doctorId validation
+    if (doctorId && !ObjectId.isValid(doctorId)) {
+      return res.status(400).json({ error: "Invalid doctorId format" });
+    }
+
+    const updatedPatient = {
+      ...(firstName && { firstName }),
+      ...(lastName && { lastName }),
+      ...(age && { age }),
+      ...(phone && { phone }),
+      ...(doctorId && { doctorId: new ObjectId(doctorId) }),
+      ...(ailment && { ailment }),
+      ...(address && { address }),
+    };
 
     const result = await db.collection("patients").updateOne(
       { _id: new ObjectId(id) },
-      { $set: updatedData }
+      { $set: updatedPatient }
     );
 
     if (result.matchedCount === 0) {
@@ -211,7 +253,9 @@ router.delete("/:id", async (req, res) => {
       return res.status(400).json({ error: "Invalid patient ID format" });
     }
 
-    const result = await db.collection("patients").deleteOne({ _id: new ObjectId(id) });
+    const result = await db
+      .collection("patients")
+      .deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: "Patient not found" });
