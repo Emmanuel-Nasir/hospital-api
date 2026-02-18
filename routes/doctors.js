@@ -1,6 +1,7 @@
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const { getDB } = require("../db/connect");
+const isAuthenticated = require("../middleware/isAuthenticated");
 
 const router = express.Router();
 
@@ -13,13 +14,13 @@ const router = express.Router();
  *       required:
  *         - name
  *         - specialization
- *         - phone
+ *         - phone Number
  *       properties:
  *         name:
  *           type: string
  *         specialization:
  *           type: string
- *         phone:
+ *         phone Number:
  *           type: string
  *         department:
  *           type: string
@@ -35,6 +36,7 @@ const router = express.Router();
  *       200:
  *         description: List of doctors
  */
+
 router.get("/", async (req, res) => {
   try {
     const db = getDB();
@@ -105,19 +107,19 @@ router.get("/:id", async (req, res) => {
  *       400:
  *         description: Missing required fields
  */
-router.post("/", async (req, res) => {
+router.post("/", isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
-    const { name, specialization, phone, department } = req.body;
+    const { name, specialization, phoneNumber, department } = req.body;
 
-    if (!name || !specialization || !phone) {
-      return res.status(400).json({ error: "name, specialization, phone are required" });
+    if (!name || !specialization || !phoneNumber) {
+      return res.status(400).json({ error: "name, specialization, phone number are required" });
     }
 
     const newDoctor = {
       name,
       specialization,
-      phone,
+      phoneNumber,
       department: department || ""
     };
 
@@ -149,7 +151,7 @@ router.post("/", async (req, res) => {
  *       404:
  *         description: Doctor not found
  */
-router.put("/:id", async (req, res) => {
+router.put("/:id", isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
@@ -196,7 +198,7 @@ router.put("/:id", async (req, res) => {
  *       404:
  *         description: Doctor not found
  */
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;

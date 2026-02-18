@@ -1,6 +1,7 @@
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const { getDB } = require("../db/connect");
+const isAuthenticated = require("../middleware/isAuthenticated");
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ const router = express.Router();
  *           type: string
  *         age:
  *           type: integer
- *         phone:
+ *         phone number:
  *           type: string
  *         doctorId:
  *           type: string
@@ -114,15 +115,15 @@ router.get("/:id", async (req, res) => {
  *       400:
  *         description: Missing required fields
  */
-router.post("/", async (req, res) => {
+router.post("/",isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
 
-    const { firstName, lastName, age, phone, doctorId, ailment, address } =
+    const { firstName, lastName, age, phoneNumber, doctorId, ailment, address } =
       req.body;
 
     // Required validation
-    if (!firstName || !lastName || !age || !phone) {
+    if (!firstName || !lastName || !age || !phoneNumber) {
       return res.status(400).json({
         error: "firstName, lastName, age, phone are required",
       });
@@ -137,7 +138,7 @@ router.post("/", async (req, res) => {
       firstName,
       lastName,
       age,
-      phone,
+      phoneNumber,
       doctorId: doctorId ? new ObjectId(doctorId) : null,
       ailment: ailment || "",
       address: address || "",
@@ -181,7 +182,7 @@ router.post("/", async (req, res) => {
  *       404:
  *         description: Patient not found
  */
-router.put("/:id", async (req, res) => {
+router.put("/:id", isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
@@ -190,7 +191,7 @@ router.put("/:id", async (req, res) => {
       return res.status(400).json({ error: "Invalid patient ID format" });
     }
 
-    const { firstName, lastName, age, phone, doctorId, ailment, address } =
+    const { firstName, lastName, age, phoneNumber, doctorId, ailment, address } =
       req.body;
 
     // doctorId validation
@@ -202,7 +203,7 @@ router.put("/:id", async (req, res) => {
       ...(firstName && { firstName }),
       ...(lastName && { lastName }),
       ...(age && { age }),
-      ...(phone && { phone }),
+      ...(phoneNumber && { phoneNumber }),
       ...(doctorId && { doctorId: new ObjectId(doctorId) }),
       ...(ailment && { ailment }),
       ...(address && { address }),
@@ -244,7 +245,7 @@ router.put("/:id", async (req, res) => {
  *       404:
  *         description: Patient not found
  */
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
