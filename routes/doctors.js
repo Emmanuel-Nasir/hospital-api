@@ -20,7 +20,8 @@ const router = express.Router();
  *           type: string
  *         specialization:
  *           type: string
- *         phone Number:
+ *         phone
+ * Number:
  *           type: string
  *         department:
  *           type: string

@@ -23,7 +23,7 @@ const router = express.Router();
  *           type: string
  *         age:
  *           type: integer
- *         phone number:
+ *         phoneNumber:
  *           type: string
  *         doctorId:
  *           type: string
