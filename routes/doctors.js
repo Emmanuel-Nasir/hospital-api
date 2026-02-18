@@ -14,19 +14,21 @@ const router = express.Router();
  *       required:
  *         - name
  *         - specialization
- *         - phone Number
+ *         - phoneNumber
  *       properties:
  *         name:
  *           type: string
+ *           example: "Emmanuel Nasir"
  *         specialization:
  *           type: string
- *         phone
- * Number:
+ *           example: "General Surgeon"
+ *         phoneNumber:
  *           type: string
+ *           example: "0902441441162"
  *         department:
  *           type: string
+ *           example: "Consulting Doctor"
  */
-
 /**
  * @swagger
  * /doctors:

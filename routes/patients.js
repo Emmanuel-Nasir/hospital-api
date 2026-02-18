@@ -15,24 +15,30 @@ const router = express.Router();
  *         - firstName
  *         - lastName
  *         - age
- *         - phone
+ *         - phoneNumber
  *       properties:
  *         firstName:
  *           type: string
+ *           example: "John"
  *         lastName:
  *           type: string
+ *           example: "Doe"
  *         age:
  *           type: integer
+ *           example: 30
  *         phoneNumber:
  *           type: string
+ *           example: "0902441441162"
  *         doctorId:
  *           type: string
+ *           example: "64f1a2b3c4d5e6f7a8b9c0d1"
  *         ailment:
  *           type: string
+ *           example: "Malaria"
  *         address:
  *           type: string
+ *           example: "123 Main St"
  */
-
 /**
  * @swagger
  * /patients:
