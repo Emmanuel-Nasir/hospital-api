@@ -227,7 +227,7 @@ router.put("/:id", isAuthenticated, async (req, res) => {
       return res.status(400).json({ error: "Invalid appointment ID format" });
     }
 
-    const updatedData = req.body;
+    const {_id, createdAt, updatedAt, ...updatedData} = req.body;
 
     if (!updatedData || Object.keys(updatedData).length === 0) {
       return res.status(400).json({ error: "Update data cannot be empty" });
