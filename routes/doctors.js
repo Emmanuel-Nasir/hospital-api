@@ -29,6 +29,7 @@ const router = express.Router();
  *           type: string
  *           example: "Consulting Doctor"
  */
+
 /**
  * @swagger
  * /doctors:
@@ -39,7 +40,6 @@ const router = express.Router();
  *       200:
  *         description: List of doctors
  */
-
 router.get("/", async (req, res) => {
   try {
     const db = getDB();
@@ -60,7 +60,6 @@ router.get("/", async (req, res) => {
  *       - in: path
  *         name: id
  *         required: true
- *         description: Doctor ID
  *         schema:
  *           type: string
  *     responses:
@@ -116,18 +115,18 @@ router.post("/", isAuthenticated, async (req, res) => {
     const { name, specialization, phoneNumber, department } = req.body;
 
     if (!name || !specialization || !phoneNumber) {
-      return res.status(400).json({ error: "name, specialization, phone number are required" });
+      return res.status(400).json({ error: "name, specialization, phoneNumber are required" });
     }
 
     const newDoctor = {
       name,
       specialization,
       phoneNumber,
-      department: department || ""
+      department: department || "",
     };
 
     const result = await db.collection("doctors").insertOne(newDoctor);
-    res.status(201).json({ message: "Doctor created", id: result.insertedId });
+    res.status(201).json({ message: "Doctor created successfully", id: result.insertedId });
   } catch (error) {
     res.status(500).json({ error: "Failed to create doctor" });
   }
@@ -143,7 +142,6 @@ router.post("/", isAuthenticated, async (req, res) => {
  *       - in: path
  *         name: id
  *         required: true
- *         description: Doctor ID
  *         schema:
  *           type: string
  *     responses:
@@ -163,7 +161,13 @@ router.put("/:id", isAuthenticated, async (req, res) => {
       return res.status(400).json({ error: "Invalid doctor ID format" });
     }
 
-    const updatedData = req.body;
+    // ✅ Strip _id so MongoDB doesn't throw
+    const { _id, ...updatedData } = req.body;
+
+    // ✅ Empty body check
+    if (!updatedData || Object.keys(updatedData).length === 0) {
+      return res.status(400).json({ error: "Update data cannot be empty" });
+    }
 
     const result = await db.collection("doctors").updateOne(
       { _id: new ObjectId(id) },
@@ -190,7 +194,6 @@ router.put("/:id", isAuthenticated, async (req, res) => {
  *       - in: path
  *         name: id
  *         required: true
- *         description: Doctor ID
  *         schema:
  *           type: string
  *     responses:

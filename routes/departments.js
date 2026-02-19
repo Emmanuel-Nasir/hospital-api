@@ -70,7 +70,6 @@ const router = express.Router();
  *       - in: path
  *         name: id
  *         required: true
- *         description: Department ID
  *         schema:
  *           type: string
  *     responses:
@@ -115,7 +114,6 @@ const router = express.Router();
  *       - in: path
  *         name: id
  *         required: true
- *         description: Department ID
  *         schema:
  *           type: string
  *     requestBody:
@@ -145,7 +143,6 @@ const router = express.Router();
  *       - in: path
  *         name: id
  *         required: true
- *         description: Department ID
  *         schema:
  *           type: string
  *     responses:
@@ -158,7 +155,6 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-
 
 router.get("/", async (req, res) => {
   try {
@@ -187,12 +183,11 @@ router.get("/:id", async (req, res) => {
 
     res.status(200).json(department);
   } catch (error) {
-    res.status(500).json({ error: "Invalid department ID" });
+    res.status(500).json({ error: "Failed to fetch department" });
   }
 });
 
-
-router.post("/", isAuthenticated,async (req, res) => {
+router.post("/", isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
     const { name, description, floor, headDoctor } = req.body;
@@ -211,12 +206,11 @@ router.post("/", isAuthenticated,async (req, res) => {
     };
 
     const result = await db.collection("departments").insertOne(newDepartment);
-    res.status(201).json({ message: "Department created Successfullly", id: result.insertedId });
+    res.status(201).json({ message: "Department created successfully", id: result.insertedId });
   } catch (error) {
     res.status(500).json({ error: "Failed to create department" });
   }
 });
-
 
 router.put("/:id", isAuthenticated, async (req, res) => {
   try {
@@ -227,12 +221,15 @@ router.put("/:id", isAuthenticated, async (req, res) => {
       return res.status(400).json({ error: "Invalid department ID format" });
     }
 
+    // ✅ Strip immutable fields before update
+    const { _id, createdAt, updatedAt, ...updatedData } = req.body;
 
-const updatedData = req.body;
+    if (!updatedData || Object.keys(updatedData).length === 0) {
+      return res.status(400).json({ error: "Update data cannot be empty" });
+    }
 
-if (!updatedData || Object.keys(updatedData).length === 0) {
-  return res.status(400).json({ error: "Update data cannot be empty" });
-}
+    // ✅ Always refresh updatedAt
+    updatedData.updatedAt = new Date();
 
     const result = await db.collection("departments").updateOne(
       { _id: new ObjectId(id) },
@@ -249,7 +246,7 @@ if (!updatedData || Object.keys(updatedData).length === 0) {
   }
 });
 
-router.delete("/:id", isAuthenticated,async (req, res) => {
+router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
