@@ -152,21 +152,18 @@ router.post("/", isAuthenticated, async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
+ *               name:
  *                 type: string
- *                 example: John
- *               lastName:
+ *                 example: Emmanuel Nasir
+ *               specialization:
  *                 type: string
- *                 example: Doe
- *               specialty:
+ *                 example: General Surgeon
+ *               phoneNumber:
  *                 type: string
- *                 example: Cardiologist
- *               phone:
+ *                 example: "09024414411"
+ *               department:
  *                 type: string
- *                 example: "+2348012345678"
- *               email:
- *                 type: string
- *                 example: johndoe@gmail.com
+ *                 example: Consulting Doctor
  *     responses:
  *       200:
  *         description: Doctor updated successfully
@@ -177,7 +174,6 @@ router.post("/", isAuthenticated, async (req, res) => {
  *       500:
  *         description: Server error
  */
-
 router.put("/:id", isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
