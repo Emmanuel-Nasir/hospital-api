@@ -142,16 +142,42 @@ router.post("/", isAuthenticated, async (req, res) => {
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Doctor ID
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: John
+ *               lastName:
+ *                 type: string
+ *                 example: Doe
+ *               specialty:
+ *                 type: string
+ *                 example: Cardiologist
+ *               phone:
+ *                 type: string
+ *                 example: "+2348012345678"
+ *               email:
+ *                 type: string
+ *                 example: johndoe@gmail.com
  *     responses:
  *       200:
- *         description: Doctor updated
+ *         description: Doctor updated successfully
  *       400:
- *         description: Invalid ID
+ *         description: Invalid ID or empty update data
  *       404:
  *         description: Doctor not found
+ *       500:
+ *         description: Server error
  */
+
 router.put("/:id", isAuthenticated, async (req, res) => {
   try {
     const db = getDB();
